@@ -58,7 +58,7 @@ function getCurrentTemp(latitude, longitude, sectionId) {
     .catch(error => {
         console.error('Fetch error:', error);
         const citySection = document.querySelector(`#${sectionId}`);
-        citySection.innerHTML += `<p style="color:red;">Unable to load weather data: ${error.message}</p>`;
+        citySection.innerHTML += `<p style="color:red;">Unable to load weather data: Please try again later ${error.message}</p>`;
     });
 }
 
@@ -94,7 +94,7 @@ function getCurrentWeatherCode(latitude, longitude, sectionId) {
     .catch(error => {
         console.error('Fetch error:', error);
         const citySection = document.querySelector(`#${sectionId}`);
-        citySection.innerHTML += `<p style="color:red;">Unable to load weather data: ${error.message}</p>`;
+        citySection.innerHTML += `<p style="color:red;">Unable to load weather data: Please try again later. ${error.message}</p>`;
     });
 }
 
@@ -116,3 +116,120 @@ if (conditionBtn) {
 
 
 cities.forEach(city => getCurrentTemp(city.lat, city.lon, city.id));
+
+
+// Adding location feature
+
+// Returns a list that best match the query or user input
+function searchLocations(query) {
+    // Clear previous results
+    geoResults.innerHTML = '';
+
+    fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`) //Self note: encodeURIComponent helps with space special characters
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            renderGeoResults(data);
+        })
+        .catch(error => {
+            console.error('Geocoding error:', error);
+            const li = document.createElement('li');
+            li.textContent = `Could not search locations: Please try again or Try again later if the problem perssist. ${error.message}`;
+            geoResults.appendChild(li);
+        });
+}
+
+
+
+// shows the list of result
+function renderGeoResults(data) {
+    geoResults.innerHTML = '';
+
+    // if searchLocation returns empty list
+    if (!data || !data.results || data.results.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No matches found. Please input a proper location';
+        geoResults.appendChild(li);
+        return;
+    }
+
+    data.results.forEach(place => {
+        const { name, latitude, longitude, country, admin1 } = place;
+
+        const li = document.createElement('li');
+
+        const label = document.createElement('span');
+        label.textContent = admin1 && country
+            ? `${name}, ${admin1}, ${country}`
+            : `${name}${country ? ', ' + country : ''}`;
+
+        const addBtn = document.createElement('button');
+        addBtn.className = 'pick';
+        addBtn.textContent = 'Add Location';
+
+        addBtn.addEventListener('click', () => {
+            const sectionId = makeUniqueSectionId(name);
+            addCitySection({ id: sectionId, title: label.textContent, lat: latitude, lon: longitude });
+
+            getCurrentTemp(latitude, longitude, sectionId);
+
+            //empty search bar
+            geoInput.value = '';
+            geoResults.innerHTML = '';
+            geoInput.focus();
+        });
+
+        li.appendChild(label);
+        li.appendChild(addBtn);
+        geoResults.appendChild(li);
+    });
+}
+
+
+function makeUniqueSectionId(name) {
+    
+    let base = String(name).replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, ''); //removes spaces and special characters
+    if (!base) base = 'City';
+    let id = base;
+    let i = 2;
+    while (document.getElementById(id)) {
+        id = `${base}${i}`;
+        i++;
+    }
+    return id;
+}
+
+// add new city section to add card
+function addCitySection({ id, title, lat, lon }) {
+    const weatherContainer = document.querySelector('#weather');
+
+    const section = document.createElement('section');
+    section.id = id;
+
+    const h1 = document.createElement('h1');
+    h1.innerText = title;
+
+    section.appendChild(h1);
+    weatherContainer.appendChild(section);
+
+    // addin the cities object
+    cities.push({ lat, lon, id });
+}
+
+const geoForm = document.querySelector('#geoForm');
+const geoInput = document.querySelector('#geoQuery');
+const geoResults = document.querySelector('#geoResults');
+
+// use searchLocation function (GEO API) and  return the list API returns 
+if (geoForm && geoInput && geoResults) {
+    geoForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const query = geoInput.value.trim();
+        if (!query) return;
+        searchLocations(query);
+    });
+}
