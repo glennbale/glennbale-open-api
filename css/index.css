@@ -10,6 +10,68 @@ h1 {
     font-family: 'Poppins', sans-serif;
 }
 
+/* Search section */
+#search { 
+    padding: 16px 20px; 
+    display: grid; gap: 12px; 
+}
+
+#geoForm { 
+    display: flex; 
+    gap: 10px;
+    justify-content: center; 
+}
+
+#geoForm input { 
+    flex: 1; 
+    max-width: 420px; 
+    padding: 10px 12px; 
+    border: 2px solid #333; 
+    border-radius: 10px; 
+    font-size: 1rem;
+}
+
+#geoForm button { 
+    padding: 10px 16px; 
+    border: none; 
+    border-radius: 10px; 
+    font-weight: 600; 
+    cursor: pointer; 
+}
+
+#geoResults { 
+    list-style: none; 
+    margin: 0; 
+    padding-left: 0; 
+    display: grid; 
+    gap: 8px; 
+    max-width: 720px; 
+    margin-inline: auto; 
+}
+
+#geoResults li { 
+    background: #fff; 
+    border: 2px solid #333; 
+    border-radius: 10px; 
+    padding: 10px 12px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+#geoResults button.pick { 
+    border: none; 
+    border-radius: 8px; 
+    padding: 8px 12px; 
+    cursor: pointer; 
+}
+
+#weather ul { 
+    list-style: none; 
+    padding-left: 0; 
+} 
+
+
 /*  Button section */
 #button {
     font-family: 'Inter', sans-serif;

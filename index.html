@@ -7,9 +7,17 @@
     <link href="css/index.css" rel="stylesheet" />
 </head>
 <body>
+    <section id="search">
+        <form id="geoForm" autocomplete="off">
+            <input id="geoQuery" type="text" placeholder="Search city" />
+            <button type="submit">Search</button>
+        </form>
+        <ul id="geoResults" aria-live="polite"></ul>
+    </section>
+
     <section id="button">
-        <button class="temp-btn">Show Current Temperature</button>
-        <button class="condition-btn">Show Current Condition</button>
+        <button class="temp-btn">Show Current Temperature of Locations</button>
+        <button class="condition-btn">Show Current Condition of Locations</button>
     </section>
     <section id="weather">
         <section id="LosAngeles">
